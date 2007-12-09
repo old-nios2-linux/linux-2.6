@@ -39,6 +39,61 @@ unsigned int dma_device_address[MAX_M68K_DMA_CHANNELS];
 
 /***************************************************************************/
 
+static struct mcf_platform_uart m523x_uart_platform[] = {
+	{
+		.mapbase	= MCF_MBAR + MCFUART_BASE1,
+		.irq		= MCFINT_VECBASE + MCFINT_UART0,
+	},
+	{
+		.mapbase 	= MCF_MBAR + MCFUART_BASE2,
+		.irq		= MCFINT_VECBASE + MCFINT_UART0 + 1,
+	},
+	{
+		.mapbase 	= MCF_MBAR + MCFUART_BASE3,
+		.irq		= MCFINT_VECBASE + MCFINT_UART0 + 2,
+	},
+	{ },
+};
+
+static struct platform_device m523x_uart = {
+	.name			= "mcfuart",
+	.id			= 0,
+	.dev.platform_data	= m523x_uart_platform,
+};
+
+static struct platform_device *m523x_devices[] __initdata = {
+	&m523x_uart,
+};
+
+/***************************************************************************/
+
+#define	INTC0	(MCF_MBAR + MCFICM_INTC0)
+
+static void m523x_uart_init_line(int line, int irq)
+{
+	u32 imr;
+
+	if ((line < 0) || (line > 2))
+		return;
+
+	writeb(0x30+line, (INTC0 + MCFINTC_ICR0 + MCFINT_UART0 + line));
+
+	imr = readl(INTC0 + MCFINTC_IMRL);
+	imr &= ~((1 << (irq - MCFINT_VECBASE)) | 1);
+	writel(imr, INTC0 + MCFINTC_IMRL);
+}
+
+void m523x_uarts_init(void)
+{
+	const int nrlines = ARRAY_SIZE(m523x_uart_platform);
+	int line;
+
+	for (line = 0; (line < nrlines); line++)
+		m523x_uart_init_line(line, m523x_uart_platform[line].irq);
+}
+
+/***************************************************************************/
+
 void mcf_disableall(void)
 {
 	*((volatile unsigned long *) (MCF_IPSBAR + MCFICM_INTC0 + MCFINTC_IMRH)) = 0xffffffff;

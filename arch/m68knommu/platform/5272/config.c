@@ -48,6 +48,60 @@ unsigned int dma_device_address[MAX_M68K_DMA_CHANNELS];
 
 /***************************************************************************/
 
+static struct mcf_platform_uart m5272_uart_platform[] = {
+	{
+		.mapbase	= MCF_MBAR + MCFUART_BASE1,
+		.irq		= 73,
+	},
+	{
+		.mapbase 	= MCF_MBAR + MCFUART_BASE2,
+		.irq		= 74,
+	},
+	{ },
+};
+
+static struct platform_device m5272_uart = {
+	.name			= "mcfuart",
+	.id			= 0,
+	.dev.platform_data	= m5272_uart_platform,
+};
+
+static struct platform_device *m5272_devices[] __initdata = {
+	&m5272_uart,
+};
+
+/***************************************************************************/
+
+static void m5272_uart_init_line(int line, int irq)
+{
+	u32 v;
+
+	if ((line >= 0) && (line < 2)) {
+		v = (line) ? 0x0e000000 : 0xe0000000;
+		writel(v, MCF_MBAR + MCFSIM_ICR2);
+
+		/* Enable the output lines for the serial ports */
+		v = readl(MCF_MBAR + MCFSIM_PBCNT);
+		v = (v & ~0x000000ff) | 0x00000055;
+		writel(v, MCF_MBAR + MCFSIM_PBCNT);
+
+		v = readl(MCF_MBAR + MCFSIM_PDCNT);
+		v = (v & ~0x000003fc) | 0x000002a8;
+		writel(v, MCF_MBAR + MCFSIM_PDCNT);
+	}
+}
+
+void m5272_uarts_init(void)
+{
+	const int nrlines = ARRAY_SIZE(m5272_uart_platform);
+	int line;
+
+	for (line = 0; (line < nrlines); line++)
+		m5272_uart_init_line(line, m5272_uart_platform[line].irq);
+}
+
+/***************************************************************************/
+
 void mcf_disableall(void)
 {
 	volatile unsigned long	*icrp;
@@ -108,10 +162,6 @@ void config_BSP(char *commandp, int size)
 #if defined(CONFIG_NETtel) || defined(CONFIG_SCALES)
 	/* Copy command line from FLASH to local buffer... */
 	memcpy(commandp, (char *) 0xf0004000, size);
-	commandp[size-1] = 0;
-#elif defined(CONFIG_MTD_KeyTechnology)
-	/* Copy command line from FLASH to local buffer... */
-	memcpy(commandp, (char *) 0xffe06000, size);
 	commandp[size-1] = 0;
 #elif defined(CONFIG_CANCam)
 	/* Copy command line from FLASH to local buffer... */

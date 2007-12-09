@@ -43,6 +43,54 @@ unsigned int dma_device_address[MAX_M68K_DMA_CHANNELS];
 
 /***************************************************************************/
 
+static struct mcf_platform_uart m5407_uart_platform[] = {
+	{
+		.mapbase	= MCF_MBAR + MCFUART_BASE1,
+		.irq		= 73,
+	},
+	{
+		.mapbase 	= MCF_MBAR + MCFUART_BASE2,
+		.irq		= 74,
+	},
+	{ },
+};
+
+static struct platform_device m5407_uart = {
+	.name			= "mcfuart",
+	.id			= 0,
+	.dev.platform_data	= m5407_uart_platform,
+};
+
+static struct platform_device *m5407_devices[] __initdata = {
+	&m5407_uart,
+};
+
+/***************************************************************************/
+
+static void m5407_uart_init_line(int line, int irq)
+{
+	if (line == 0) {
+		writel(MCFSIM_ICR_LEVEL6 | MCFSIM_ICR_PRI1, MCF_MBAR + MCFSIM_UART1ICR);
+		writeb(irq, MCFUART_BASE1 + MCFUART_UIVR);
+		mcf_setimr(mcf_getimr() & ~MCFSIM_IMR_UART1);
+	} else if (line == 1) {
+		writel(MCFSIM_ICR_LEVEL6 | MCFSIM_ICR_PRI2, MCF_MBAR + MCFSIM_UART2ICR);
+		writeb(irq, MCFUART_BASE2 + MCFUART_UIVR);
+		mcf_setimr(mcf_getimr() & ~MCFSIM_IMR_UART2);
+	}
+}
+
+void m5407_uarts_init(void)
+{
+	const int nrlines = ARRAY_SIZE(m5407_uart_platform);
+	int line;
+
+	for (line = 0; (line < nrlines); line++)
+		m5407_uart_init_line(line, m5407_uart_platform[line].irq);
+}
+
+/***************************************************************************/
+
 void mcf_autovector(unsigned int vec)
 {
 	volatile unsigned char  *mbar;

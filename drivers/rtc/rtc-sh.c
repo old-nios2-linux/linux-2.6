@@ -228,7 +228,6 @@ static int sh_rtc_open(struct device *dev)
 	if (unlikely(ret)) {
 		dev_err(dev, "request carry IRQ failed with %d, IRQ %d\n",
 			ret, rtc->carry_irq);
-		free_irq(rtc->periodic_irq, dev);
 		goto err_bad_carry;
 	}
 
@@ -300,8 +299,7 @@ static int sh_rtc_ioctl(struct device *dev, unsigned int cmd, unsigned long arg)
 
 static int sh_rtc_read_time(struct device *dev, struct rtc_time *tm)
 {
-	struct platform_device *pdev = to_platform_device(dev);
-	struct sh_rtc *rtc = platform_get_drvdata(pdev);
+	struct sh_rtc *rtc = dev_get_drvdata(dev);
 	unsigned int sec128, sec2, yr, yr100, cf_bit;
 
 	do {
@@ -359,8 +357,7 @@ static int sh_rtc_read_time(struct device *dev, struct rtc_time *tm)
 
 static int sh_rtc_set_time(struct device *dev, struct rtc_time *tm)
 {
-	struct platform_device *pdev = to_platform_device(dev);
-	struct sh_rtc *rtc = platform_get_drvdata(pdev);
+	struct sh_rtc *rtc = dev_get_drvdata(dev);
 	unsigned int tmp;
 	int year;
 

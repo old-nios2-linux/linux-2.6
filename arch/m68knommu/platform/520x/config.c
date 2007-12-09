@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2005,      Freescale (www.freescale.com)
  *  Copyright (C) 2005,      Intec Automation (mike@steroidmicros.com)
- *  Copyright (C) 1999-2003, Greg Ungerer (gerg@snapgear.com)
+ *  Copyright (C) 1999-2007, Greg Ungerer (gerg@snapgear.com)
  *  Copyright (C) 2001-2003, SnapGear Inc. (www.snapgear.com)
  */
 
@@ -16,6 +16,10 @@
 #include <linux/interrupt.h>
 #include <asm/machdep.h>
 #include <asm/dma.h>
+#include <asm/io.h>
+#include <asm/coldfire.h>
+#include <asm/mcfsim.h>
+#include <asm/mcfuart.h>
 
 /***************************************************************************/
 

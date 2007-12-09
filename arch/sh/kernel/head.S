@@ -76,7 +76,14 @@ ENTRY(_stext)
 	mov.l	7f, r0
 	ldc	r0, r7_bank	! ... and initial thread_info
 #endif
-	
+
+#if defined(CONFIG_SH_CONCAT_FS)
+	! move the fs to after the bss
+	mov.l   7f, r0
+	jsr @r0
+	nop
+#endif
+
 	!			Clear BSS area
 #ifdef CONFIG_SMP	
 	mov.l	3f, r0

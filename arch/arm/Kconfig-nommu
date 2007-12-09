@@ -3,6 +3,15 @@
 # Hyok S. Choi <hyok.choi@samsung.com>
 # 
 
+config PROCESSOR_ID
+	hex 'Hard wire the processor ID'
+	default 0x00007700
+	depends on !CPU_CP15
+	help
+	  Hard set the processor ID to this value. If the processor has no
+	  CP15 register then the kernel cannot probe the processor ID, and
+	  so hard setting the value is the only option.
+
 config SET_MEM_PARAM
 	bool "Set flash/sdram size and base addr"
 	help
