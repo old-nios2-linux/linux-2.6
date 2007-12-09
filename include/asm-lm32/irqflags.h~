@@ -1,0 +1,18 @@
+#ifndef __ASM_LM32_IRQFLAGS_H
+#define __ASM_LM32_IRQFLAGS_H
+
+#ifdef __KERNEL__
+
+#include <asm/ptrace.h>
+
+/*
+ * CPU interrupt mask handling.
+ */
+
+/*
+ * Save the current interrupt enable state & disable IRQs
+ */
+
+
+#endif
+#endif
