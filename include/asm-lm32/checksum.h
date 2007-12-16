@@ -65,7 +65,6 @@ static inline __sum16 csum_fold(__wsum sum)
 static inline __sum16
 ip_fast_csum(const void *iph, unsigned int ihl)
 {
-        unsigned int tmp1;
         __wsum sum;
 
 	__asm__ __volatile__(
