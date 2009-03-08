@@ -61,12 +61,13 @@ sub translate {
 			$boolean_base_address_cast = 1;
 		}
 	}
-
-	if ($module_name eq $required_module_name && 
-			!$boolean_base_address_cast) {
-		printf ("/* No translation necessary for $module_name */\n\n");
-		return;
+#comment out by dxzhang
+#	if ($module_name eq $required_module_name && 
+#			!$boolean_base_address_cast) {
+#		printf ("/* No translation necessary for $module_name */\n\n");
+#		return;
 	}
+#end comment out
 
 	# undefine the original entries
 	print "/* Redefining $module_name -> $required_module_name */\n";

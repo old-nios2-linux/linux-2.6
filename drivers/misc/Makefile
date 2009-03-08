@@ -33,3 +33,8 @@ obj-$(CONFIG_SGI_XP)		+= sgi-xp/
 obj-$(CONFIG_SGI_GRU)		+= sgi-gru/
 obj-$(CONFIG_HP_ILO)		+= hpilo.o
 obj-$(CONFIG_C2PORT)		+= c2port/
+#add by dxzhang
+obj-$(CONFIG_HELLO)             += hello.o
+obj-$(CONFIG_SW_LED)            += sw_led.o
+#end by dxzhang
+
