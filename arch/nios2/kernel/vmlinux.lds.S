@@ -117,6 +117,7 @@ SECTIONS
 		. = ALIGN(4);
 		__initramfs_start = .;
 		*(.init.ramfs)
+		. = ALIGN(4);
 		__initramfs_end = .;
 	}
   	__init_end = .;
