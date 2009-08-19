@@ -35,13 +35,13 @@ extern void cache_clear (unsigned long paddr, int len);
 
 #define flush_cache_all()			__flush_cache_all()
 #define flush_cache_mm(mm)			do { } while (0)
-#define flush_cache_range(vma, start, end)	cache_push(start, end - start)
+#define flush_cache_range(vma, start, end)	cache_push((start), (end) - (start))
 #define flush_cache_page(vma, vmaddr)		do { } while (0)
-#define flush_dcache_range(start,end)		dcache_push(start, end - start)
+#define flush_dcache_range(start,end)		dcache_push((start), (end) - (start))
 #define flush_dcache_page(page)			do { } while (0)
 #define flush_dcache_mmap_lock(mapping)		do { } while (0)
 #define flush_dcache_mmap_unlock(mapping)	do { } while (0)
-#define flush_icache_range(start,end)		cache_push(start, end - start)
+#define flush_icache_range(start,end)		cache_push((start), (end) - (start))
 #define flush_icache_page(vma,pg)		do { } while (0)
 #define flush_icache_user_range(vma,pg,adr,len)	do { } while (0)
 
