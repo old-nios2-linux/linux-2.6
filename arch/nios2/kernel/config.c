@@ -402,7 +402,6 @@ static struct platform_nand_data nios2_plat_nand_data = {
 	},
 };
 
-#define MAX(x, y) (x > y ? x : y)
 static struct resource nios2_plat_nand_resources = {
 	.start = na_nand_flash_0,
 	.end   = na_nand_flash_0 + 12,
