@@ -62,7 +62,7 @@ static int regoff[] = {
 	PT_REG( fp), PT_REG( ea),          -1, PT_REG( ra),  /* reg 31 */
 	PT_REG( ea),          -1,          -1,          -1,  /* use ea for pc */
 	         -1,          -1,          -1,          -1,
-	         -1,          -1,          -1,          -1   /* reg 43 */ 
+	         -1,          -1,          -1,          -1   /* reg 43 */
 };
 
 /*
@@ -74,7 +74,7 @@ static inline long get_reg(struct task_struct *task, int regno)
 
 	if (regoff[regno] == -1)
 		return 0;
-	else if (regno < sizeof(regoff)/sizeof(regoff[0]))
+	else if (regno < ARRAY_SIZE(regoff))
 		addr = (unsigned long *)((char *)task->thread.kregs + regoff[regno]);
 	else
 		return 0;
@@ -91,7 +91,7 @@ static inline int put_reg(struct task_struct *task, int regno,
 
 	if (regoff[regno] == -1)
 		return -1;
-	else if (regno < sizeof(regoff)/sizeof(regoff[0]))
+	else if (regno < ARRAY_SIZE(regoff))
 		addr = (unsigned long *)((char *)task->thread.kregs + regoff[regno]);
 	else
 		return -1;
@@ -114,7 +114,7 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 
 	switch (request) {
 		/* when I and D space are separate, these will need to be fixed. */
-		case PTRACE_PEEKTEXT: /* read word at location addr. */ 
+		case PTRACE_PEEKTEXT: /* read word at location addr. */
 		case PTRACE_PEEKDATA: {
 			unsigned long tmp;
 			int copied;
@@ -132,17 +132,17 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 		/* read the word at location addr in the USER area. */
 		case PTRACE_PEEKUSR: {
 			unsigned long tmp;
-			
+
 			ret = -EIO;
 			if ((addr & 3) || addr < 0 ||
 			    addr > sizeof(struct user) - 3)
 				break;
-			
+
 			PRINTK_DEBUG("%s PEEKUSR: addr=0x%08x\n", __FUNCTION__, (u32)addr);
 			tmp = 0;  /* Default return condition */
 			addr = addr >> 2; /* temporary hack. */
 			ret = -EIO;
-			if (addr < sizeof(regoff)/sizeof(regoff[0])) {
+			if (addr < ARRAY_SIZE(regoff)) {
 				tmp = get_reg(child, addr);
 			} else if (addr == PT_TEXT_ADDR/4) {
 				tmp = child->mm->start_code;
@@ -184,12 +184,12 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 				break;
 
 			addr = addr >> 2; /* temporary hack. */
-			    
+
 			if (addr == PTR_ESTATUS) {
 				data &= SR_MASK;
 				data |= get_reg(child, PTR_ESTATUS) & ~(SR_MASK);
 			}
-			if (addr < sizeof(regoff)/sizeof(regoff[0])) {
+			if (addr < ARRAY_SIZE(regoff)) {
 				if (put_reg(child, addr, data))
 					break;
 				ret = 0;
@@ -216,8 +216,8 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 		}
 
 		/*
-		 * make the child exit.  Best I can do is send it a sigkill. 
-		 * perhaps it should be put in the status that it wants to 
+		 * make the child exit.  Best I can do is send it a sigkill.
+		 * perhaps it should be put in the status that it wants to
 		 * exit.
 		 */
 		case PTRACE_KILL: {
@@ -237,11 +237,11 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 			break;
 
 		case PTRACE_GETREGS: { /* Get all gp regs from the child. */
-		  	int i;
+			int i;
 			unsigned long tmp;
 
 			PRINTK_DEBUG("%s GETREGS\n", __FUNCTION__);
-			for (i = 0; i < sizeof(regoff)/sizeof(regoff[0]); i++) {
+			for (i = 0; i < ARRAY_SIZE(regoff); i++) {
 			    tmp = get_reg(child, i);
 			    if (put_user(tmp, (unsigned long *) data)) {
 				ret = -EFAULT;
@@ -258,7 +258,7 @@ long arch_ptrace(struct task_struct *child, long request, long addr, long data)
 			unsigned long tmp;
 
 			PRINTK_DEBUG("%s SETREGS\n", __FUNCTION__);
-			for (i = 0; i < sizeof(regoff)/sizeof(regoff[0]); i++) {
+			for (i = 0; i < ARRAY_SIZE(regoff); i++) {
 			    if (get_user(tmp, (unsigned long *) data)) {
 				ret = -EFAULT;
 				break;
