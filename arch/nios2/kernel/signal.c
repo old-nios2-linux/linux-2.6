@@ -316,10 +316,12 @@ rt_restore_ucontext(struct pt_regs *regs, struct switch_stack *sw,
 	err |= __get_user(sw->r22, &gregs[21]);
 	err |= __get_user(sw->r23, &gregs[22]);
 	err |= __get_user(usp, &gregs[23]);
+	regs->sp = usp;
 	err |= __get_user(sw->fp, &gregs[24]);  // Verify, should this be settable
 	err |= __get_user(sw->gp, &gregs[25]);  // Verify, should this be settable
 
 	err |= __get_user(temp, &gregs[26]);  // Not really necessary no user settable bits
+	err |= __get_user(regs->ea, &gregs[27]);
 	regs->estatus = (regs->estatus & 0xffffffff) | (temp & 0x0);
 	err |= __get_user(regs->status_extension, 
 			  &uc->uc_mcontext.status_extension);
@@ -366,7 +368,7 @@ badframe:
 
 asmlinkage int do_rt_sigreturn(struct switch_stack *sw)
 {
-	struct pt_regs *regs = (struct pt_regs *) sw + 1;
+	struct pt_regs *regs = (struct pt_regs *)(sw + 1);
 	struct rt_sigframe *frame = (struct rt_sigframe *) regs->sp;  // Verify, can we follow the stack back
 	sigset_t set;
 	int rval;
@@ -436,6 +438,7 @@ static inline int rt_setup_ucontext(struct ucontext *uc, struct pt_regs *regs)
 	err |= __put_user(regs->sp, &gregs[23]);
 	err |= __put_user(sw->fp, &gregs[24]);
 	err |= __put_user(sw->gp, &gregs[25]);
+	err |= __put_user(regs->ea, &gregs[27]);
 	return err;
 }
 
