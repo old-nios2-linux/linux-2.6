@@ -1349,6 +1349,9 @@ static void tse_device_init(void) {}
 #if defined(CONFIG_ETHOC) || defined(CONFIG_ETHOC_MODULE)
 #include <linux/etherdevice.h>
 #include <net/ethoc.h>
+
+#define ETHOC_USE_SRAM_BUFFER 0 /* 0 for dma_alloc from system memory */
+
 static struct ethoc_platform_data ethoc_platdata = {
 	.hwaddr = { 0x00,0x07,0xed,0x0a,0x03,0x29 },
 	.phy_id = -1,
@@ -1360,11 +1363,13 @@ static struct resource ethoc_resources[] = {
 	 .end = na_igor_mac + 0xfff,
 	 .flags = IORESOURCE_MEM,
 	 },
+#if ETHOC_USE_SRAM_BUFFER
 	{
 	 .start = na_ssram,
 	 .end = na_ssram_end -1,
 	 .flags = IORESOURCE_MEM,
 	 },
+#endif
 	{
 	 .start = na_igor_mac_irq,
 	 .end = na_igor_mac_irq,
