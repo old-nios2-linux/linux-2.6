@@ -1350,6 +1350,7 @@ static void tse_device_init(void) {}
 #include <linux/etherdevice.h>
 #include <net/ethoc.h>
 static struct ethoc_platform_data ethoc_platdata = {
+	.hwaddr = { 0x00,0x07,0xed,0x0a,0x03,0x29 },
 	.phy_id = -1,
 };
 
