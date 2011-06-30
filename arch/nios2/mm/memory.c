@@ -163,9 +163,12 @@ void dcache_push(unsigned long vaddr, int len)
 EXPORT_SYMBOL(dcache_push);
 /*
  * icache_push() semantics: Invalidate instruction cache in the range.
+ * Need to write back dirty data cache lines first.  As a side-effect,
+ * this also invalidates the affected data cache lines.
  */
 void icache_push(unsigned long vaddr, int len)
 {
+	cache_invalidate_data(vaddr, len);
 	cache_invalidate_inst(vaddr, len);
 }
 
