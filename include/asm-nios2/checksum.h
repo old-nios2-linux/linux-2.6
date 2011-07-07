@@ -112,7 +112,7 @@ extern inline __sum16 csum_tcpudp_magic(unsigned long saddr,
 
 extern inline unsigned long do_csum(const unsigned char * buff, int len)
 {
- int odd, count;
+ int odd;
  unsigned long result = 0;
 
     barrier();
@@ -126,25 +126,22 @@ extern inline unsigned long do_csum(const unsigned char * buff, int len)
  	len--;
  	buff++;
  }
- count = len >> 1;		/* nr of 16-bit words.. */
- if (count) {
+ if (len >= 2) {
  	if (2 & (unsigned long) buff) {
  		result += *(unsigned short *) buff;
- 		count--;
  		len -= 2;
  		buff += 2;
  	}
- 	count >>= 1;		/* nr of 32-bit words.. */
- 	if (count) {
+ 	if (len >= 4) {
+		const unsigned char *end = buff + ((unsigned)len & ~3);
  	        unsigned long carry = 0;
  		do {
  			unsigned long w = *(unsigned long *) buff;
- 			count--;
  			buff += 4;
  			result += carry;
  			result += w;
  			carry = (w > result);
- 		} while (count);
+ 		} while (buff < end);
  		result += carry;
  		result = (result & 0xffff) + (result >> 16);
  	}
